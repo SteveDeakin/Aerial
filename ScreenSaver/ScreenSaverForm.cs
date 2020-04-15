@@ -23,7 +23,8 @@ namespace ScreenSaver
         private bool shouldCache = false;
         private bool showVideo = true;
         private bool windowMode = false;
-        
+        private IgnoreMouseClickMessageFilter ignoreMouseClicksFilter;
+
         public ScreenSaverForm()
         {
             InitializeComponent();
@@ -97,7 +98,8 @@ namespace ScreenSaver
         {
             if (!previewMode && keyData == Keys.Escape)
             {
-                this.Close();
+                GracefulShutdown();
+                //this.Close();
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -381,7 +383,7 @@ namespace ScreenSaver
             this.player.settings.enableErrorDialogs = true;
             this.player.stretchToFit = true;
             this.player.uiMode = "none";
-            Application.AddMessageFilter(new IgnoreMouseClickMessageFilter(this, player));
+            Application.AddMessageFilter(ignoreMouseClicksFilter = new IgnoreMouseClickMessageFilter(this, player));
 
             ResizePlayer();
         }
@@ -419,6 +421,13 @@ namespace ScreenSaver
 
 #endregion
 
+        // Graceful shutdown to stop race conditions with disposed RCWs and objects
+        void GracefulShutdown()
+        {
+            NextVideoTimer.Enabled = false;
+            Application.RemoveMessageFilter(ignoreMouseClicksFilter);
+            this.BeginInvoke((MethodInvoker) delegate { this.Close(); });
+        }
 
         /// <summary>
         /// Exits if not in windowed or preview mode.
@@ -426,7 +435,10 @@ namespace ScreenSaver
         void ShouldExit()
         {
             if (!previewMode && !windowMode)
+            {
+                GracefulShutdown();
                 Application.Exit();
+            }
         }
 
     }
