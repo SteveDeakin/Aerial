@@ -99,7 +99,6 @@ namespace ScreenSaver
             if (!previewMode && keyData == Keys.Escape)
             {
                 GracefulShutdown();
-                //this.Close();
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -427,6 +426,7 @@ namespace ScreenSaver
             NextVideoTimer.Enabled = false;
             Application.RemoveMessageFilter(ignoreMouseClicksFilter);
             this.BeginInvoke((MethodInvoker) delegate { this.Close(); });
+            this.Close();
         }
 
         /// <summary>
@@ -437,6 +437,7 @@ namespace ScreenSaver
             if (!previewMode && !windowMode)
             {
                 GracefulShutdown();
+
                 Application.Exit();
             }
         }
