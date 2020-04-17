@@ -81,7 +81,7 @@ namespace Aerial
             {
                 cachedEntities = new JavaScriptSerializer().Deserialize<IdAsset[]>(entries);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 //the passed in entities document is invalid.
                 return null;

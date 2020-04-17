@@ -221,6 +221,7 @@ namespace ScreenSaver
         private void btnClose_Click(object sender, EventArgs e)
         {
             Trace.WriteLine("btnClose_Click()");
+            GracefulShutdown();
             Application.Exit();
         }
 
